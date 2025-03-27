@@ -12,13 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
   private final UserRepository repository;
-  private final UserMapper mapper;
 
-  public void createUser(UserCreateRequest request, String encodedPassword) { // 회원가입 ( 유저 생성 )
-    if (repository.existsUserByEmail(request.email())) { // 중복 email 검증
+  public void createUser(User user) { // 회원가입 ( 유저 생성 )
+    if (repository.existsUserByEmail(user.getEmail())) { // 중복 email 검증
       throw new UserAlreadyExistsException("User is already exists");
     }
-    repository.save(mapper.toUser(request, encodedPassword));
+    repository.save(user);
   }
 
   public User findUserByEmail(String email) {

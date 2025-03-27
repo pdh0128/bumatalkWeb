@@ -47,14 +47,14 @@ public class SecurityConfig {
     http
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests((auth) -> auth
-                    .requestMatchers("/", "/login", "/signup", "/board/**").permitAll()
-                    .requestMatchers("/auth/**").hasRole("USER")
+                    .requestMatchers("/", "/login", "/signup", "/board/**", "/auth/logout").permitAll()
+//                    .requestMatchers("/auth/**").hasRole("USER")
                     .anyRequest().authenticated()
             );
     http
             .addFilterAt(new LoginFilter(authenticationManagerBean(authenticationConfiguration), new ObjectMapper(), jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     http
-            .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), LoginFilter.class);
+            .addFilterAfter(new JwtTokenFilter(jwtTokenProvider), LoginFilter.class);
 
     http
             .sessionManagement((session) -> session

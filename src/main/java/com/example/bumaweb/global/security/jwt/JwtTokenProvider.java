@@ -2,6 +2,7 @@ package com.example.bumaweb.global.security.jwt;
 
 import com.example.bumaweb.domain.auth.domain.RefreshToken;
 import com.example.bumaweb.domain.auth.domain.repository.RefreshTokenRepository;
+import com.example.bumaweb.domain.auth.exception.RefreshTokenException;
 import com.example.bumaweb.global.config.properties.JwtProperties;
 import com.example.bumaweb.global.security.principle.AuthDetails;
 import com.example.bumaweb.global.security.principle.AuthDetailsService;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import javax.security.auth.Subject;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
@@ -48,6 +51,9 @@ public class JwtTokenProvider {
 
   @Transactional
   public String createRefreshToken(String email) {
+    if (refreshTokenRepository.existsByEmail(email)) {
+      throw new RefreshTokenException("Refresh 토큰을 만들려하는데 이미 만들어져있었다.");
+    }
     String token = createToken(email, REFRESH_TOKEN, jwtProperties.getRefreshTime());
     refreshTokenRepository.save(
             new RefreshToken(token, email)

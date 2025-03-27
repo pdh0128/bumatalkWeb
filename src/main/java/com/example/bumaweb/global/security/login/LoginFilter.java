@@ -2,6 +2,8 @@ package com.example.bumaweb.global.security.login;
 
 import com.example.bumaweb.global.security.jwt.JwtTokenProvider;
 import com.example.bumaweb.global.security.login.dto.UserLoginDto;
+import com.example.bumaweb.global.security.login.exception.UnSuccessfulAuthenticationException;
+import com.example.bumaweb.global.security.principle.AuthDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -12,13 +14,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -44,8 +50,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   @Override
   public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authentication) {
     // 로그인 성공 -> JWT 발급
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    String email = userDetails.getUsername();
+    AuthDetails authDetails = (AuthDetails) authentication.getPrincipal();
+    String email = authDetails.getUsername();
     String accessToken = jwtTokenProvider.createAccessToken(email);
     String refreshToken = jwtTokenProvider.createRefreshToken(email);
     response.setHeader("access", accessToken);
@@ -61,6 +67,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
   @Override
   public void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException faild) {
     // 로그인 실패
-    faild.printStackTrace();
+    throw new UnSuccessfulAuthenticationException("로그인 실패");
   }
 }

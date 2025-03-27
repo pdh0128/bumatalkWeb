@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    username: "root"
+    password: "kdoornega0128"
+    url: "jdbc:mysql://localhost:3306/bumaWeb"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+  application:
+    name: bumaWeb
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password : "kdoornega0128"
+jwt:
+  acessTime: 3600
+  refreshTime:  86400
+  prefix: "bearer"
+  header: "Authorization"
+  secret-key: ${JWT_SECRET_KEY}
+
+
+server:
+  port: 9000
